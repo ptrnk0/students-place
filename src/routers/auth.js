@@ -4,6 +4,7 @@ import { loginUserSchema, registerUserSchema } from "../validation/auth.js";
 import { ctrlWrapper } from "../utils/ctrlWrapper.js";
 import {
   loginUserController,
+  logoutUserController,
   registerUserController,
 } from "../controllers/auth.js";
 
@@ -20,5 +21,7 @@ authRouter.post(
   validateBody(loginUserSchema),
   ctrlWrapper(loginUserController)
 );
+
+authRouter.post("/logout", ctrlWrapper(logoutUserController));
 
 export default authRouter;
