@@ -48,3 +48,8 @@ export async function loginUser(payload) {
     refreshTokenValidUntil: new Date(Date.now() + ONE_DAY),
   });
 }
+
+export async function logoutUser(sessionId) {
+  const session = await UsersCollection.deleteOne({ _id: sessionId });
+  return session;
+}
