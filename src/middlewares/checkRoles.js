@@ -3,7 +3,7 @@ import { ROLES } from "../constants/index.js";
 import { StudentsCollection } from "../db/models/students.js";
 
 export function checkRoles(...roles) {
-  async (req, res, next) => {
+  return async (req, res, next) => {
     const { user } = req;
 
     if (!user) {
