@@ -60,7 +60,7 @@ function setupSession(res, session) {
 }
 
 export async function refreshUserSessionController(req, res) {
-  const newSession = refreshUserSession(
+  const newSession = await refreshUserSession(
     req.cookies.sessionId,
     req.cookies.refreshToken
   );
