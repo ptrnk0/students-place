@@ -32,7 +32,7 @@ export async function loginUserController(req, res) {
     status: 200,
     message: "Successfully logged in an user!",
     data: {
-      accesToken: session.accessToken,
+      accessToken: session.accessToken,
     },
   });
 }
