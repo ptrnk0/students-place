@@ -54,7 +54,7 @@ export async function logoutUser(sessionId) {
   return session;
 }
 
-export async function createSession() {
+export function createSession() {
   const accessToken = randomBytes(30).toString("base64");
   const refreshToken = randomBytes(30).toString("base64");
 
