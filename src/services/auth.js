@@ -4,10 +4,18 @@ import { randomBytes } from "crypto";
 import { UsersCollection } from "../db/models/users.js";
 import createHttpError from "http-errors";
 import { SessionsCollection } from "../db/models/session.js";
-import { FIFTEEN_MINUTES, ONE_DAY, SMTP } from "../constants/index.js";
+import {
+  FIFTEEN_MINUTES,
+  ONE_DAY,
+  SMTP,
+  TEMPLATES_DIR,
+} from "../constants/index.js";
 import jwt from "jsonwebtoken";
 import { getEnvVar } from "../utils/getEnvVar.js";
 import { sendMail } from "../utils/sendMail.js";
+import path from "node:path";
+import fs from "node:fs/promises";
+import handlebars from "handlebars";
 
 export async function registerUser(payload) {
   const emailExist = await UsersCollection.findOne({ email: payload.email });
@@ -113,10 +121,26 @@ export async function requestResetToken(email) {
     }
   );
 
+  const templateResetPasswordPath = path.join(
+    TEMPLATES_DIR,
+    "reset-password-email.html"
+  );
+
+  const templateSource = (
+    await fs.readFile(templateResetPasswordPath)
+  ).toString();
+
+  const template = handlebars.compile(templateSource);
+
+  const html = template({
+    name: user.name,
+    link: `${getEnvVar("APP_DOMAIN")}/reset-password?token=${resetToken}`,
+  });
+
   await sendMail({
     from: getEnvVar(SMTP.SMTP_FROM),
     to: email,
     subject: "Reset your password",
-    html: `<p>Click <a href="${resetToken}">here</a> to reset your password!</p>`,
+    html,
   });
 }
