@@ -4,7 +4,10 @@ import { randomBytes } from "crypto";
 import { UsersCollection } from "../db/models/users.js";
 import createHttpError from "http-errors";
 import { SessionsCollection } from "../db/models/session.js";
-import { FIFTEEN_MINUTES, ONE_DAY } from "../constants/index.js";
+import { FIFTEEN_MINUTES, ONE_DAY, SMTP } from "../constants/index.js";
+import jwt from "jsonwebtoken";
+import { getEnvVar } from "../utils/getEnvVar.js";
+import { sendMail } from "../utils/sendMail.js";
 
 export async function registerUser(payload) {
   const emailExist = await UsersCollection.findOne({ email: payload.email });
@@ -98,4 +101,22 @@ export async function requestResetToken(email) {
   if (!user) {
     throw createHttpError(404, "User not found");
   }
+
+  const resetToken = jwt.sign(
+    {
+      sub: user._id,
+      email,
+    },
+    getEnvVar("JWT_SECRET"),
+    {
+      expiresIn: "15m",
+    }
+  );
+
+  await sendMail({
+    from: getEnvVar(SMTP.SMTP_FROM),
+    to: email,
+    subject: "Reset your password",
+    html: `<p>Click <a href="${resetToken}">here</a> to reset your password!</p>`,
+  });
 }
