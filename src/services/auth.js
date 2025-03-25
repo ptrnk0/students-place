@@ -144,3 +144,29 @@ export async function requestResetToken(email) {
     html,
   });
 }
+
+export async function resetPassword(payload) {
+  let entries;
+
+  try {
+    entries = jwt.verify(payload.token, getEnvVar("JWT_SECRET"));
+  } catch (err) {
+    if (err instanceof Error) {
+      throw createHttpError(401, err.message);
+    }
+    throw err;
+  }
+
+  const user = await UsersCollection.findOne({
+    _id: entries.sub,
+    email: entries.email,
+  });
+
+  if (!user) {
+    throw createHttpError(404, "User not found");
+  }
+
+  const encryptedPassword = await bcrypt.hash(payload.password, 10);
+
+  await UsersCollection.updateOne(user, { password: encryptedPassword });
+}
