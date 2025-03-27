@@ -9,6 +9,7 @@ import {
 import { parsePaginationParams } from "../utils/parsePaginationParams.js";
 import { parseSortParams } from "../utils/parseSortParams.js";
 import { parseFilterParams } from "../utils/parseFilterParams.js";
+import { saveFileToUploadDir } from "../utils/saveFileToUploadDir.js";
 
 export async function getAllStudentsController(req, res) {
   const { page, perPage } = parsePaginationParams(req.query);
@@ -65,8 +66,20 @@ export async function deleteStudentController(req, res, next) {
 
 export async function upsertStudentController(req, res, next) {
   const { studentId } = req.params;
+  const photo = req.file;
 
-  const result = await upsertStudent(studentId, req.body, { upsert: true });
+  let photoUrl;
+
+  if (photo) {
+    photoUrl = await saveFileToUploadDir(photo);
+  }
+
+  const result = await upsertStudent(
+    studentId,
+    { ...req.body, photo: photoUrl },
+    { upsert: true }
+  );
+
   if (!result) {
     next(createHttpError(404, "Student not found"));
   }
