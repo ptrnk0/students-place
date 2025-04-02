@@ -1,5 +1,6 @@
 import { ONE_DAY } from "../constants/index.js";
 import {
+  loginOrSigninWithGoogle,
   loginUser,
   logoutUser,
   refreshUserSession,
@@ -105,5 +106,16 @@ export async function getGoogleOAuthUrlController(req, res) {
     status: 200,
     message: "Successfully get Google OAuth url!",
     data: { url },
+  });
+}
+
+export async function loginWithGoogleController(req, res) {
+  const session = await loginOrSigninWithGoogle(res.body.code);
+  setupSession(res, session);
+
+  res.json({
+    status: 200,
+    message: "Successfully logged in via Google OAuth!",
+    data: { accessToken: session.accessToken },
   });
 }
