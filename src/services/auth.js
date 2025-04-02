@@ -194,5 +194,6 @@ export async function loginOrSigninWithGoogle(code) {
   }
 
   const newSession = createSession();
+  await SessionsCollection.deleteMany({ userId: user._id });
   return await SessionsCollection.create({ userId: user._id, ...newSession });
 }
