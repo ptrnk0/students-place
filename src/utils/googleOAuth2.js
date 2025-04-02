@@ -34,7 +34,7 @@ export async function validateCode(code) {
   return ticket;
 }
 
-export async function getFullNameFromGoogleTokenPayload(payload) {
+export function getFullNameFromGoogleTokenPayload(payload) {
   let fullName = "Guest";
 
   if (payload.given_name && payload.family_name) {
